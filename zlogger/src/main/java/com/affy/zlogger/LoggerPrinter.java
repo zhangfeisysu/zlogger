@@ -303,7 +303,7 @@ final class LoggerPrinter implements Printer {
                 continue;
             }
             StringBuilder builder = new StringBuilder();
-            builder.append("║ ")
+            builder.append("�U ")
                     .append(level)
                     .append(getSimpleClassName(trace[stackIndex].getClassName()))
                     .append(".")
@@ -402,13 +402,6 @@ final class LoggerPrinter implements Printer {
         }
     }
 
-    /**
-     * 打开日志文件并写入日志
-     *
-     * @param type    日志类型
-     * @param tag     标签
-     * @param content 内容
-     **/
     private synchronized void saveLog2File(final int type, final String tag, final String content) {
         if (content == null) return;
         Date now = new Date();

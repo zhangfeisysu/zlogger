@@ -23,3 +23,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keep class com.affy.zlogger.ZLogger{protected public *;}
+-keep class com.affy.zlogger.LogLevel{protected public *;}
+-keep class com.affy.zlogger.Settings{protected public *;}
+-dontwarn com.affy.zlogger.**
