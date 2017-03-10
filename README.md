@@ -7,6 +7,6 @@
 </ol>
 
 ##混淆规则
-'<code>-keep class com.affy.zlogger.\*\*{*;}</code><br/>
- <code>-dontwarn com.affy.zlogger.\*\*</code>'
+<code>-keep class com.affy.zlogger.\*\*{\*;}</code><br/>
+ <code>-dontwarn com.affy.zlogger.\*\*</code>
 
