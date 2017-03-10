@@ -29,3 +29,10 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.2.0'
     testCompile 'junit:junit:4.12'
 }
+
+task makeJar(type: Copy) {
+    from('build/intermediates/bundles/debug/')
+    into('release')
+    include('classes.jar')
+    rename('classes.jar', 'zlogger.jar')
+}
