@@ -303,7 +303,7 @@ final class LoggerPrinter implements Printer {
                 continue;
             }
             StringBuilder builder = new StringBuilder();
-            builder.append("�U ")
+            builder.append("║ ")
                     .append(level)
                     .append(getSimpleClassName(trace[stackIndex].getClassName()))
                     .append(".")

@@ -34,7 +34,7 @@ publish {
     userOrg = 'affy'
     groupId = 'com.affy'
     artifactId = 'zlogger'
-    publishVersion = '1.0.0'
+    publishVersion = '1.0.1'
     desc = 'an useful log util'
     website = 'https://github.com/zhangfeisysu/zlogger'
 }
