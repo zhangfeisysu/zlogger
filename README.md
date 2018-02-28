@@ -6,7 +6,17 @@
 <li>新增<code>d,w,i,e,wtf</code>类型的输出筛选</li>
 </ol>
 
+##使用说明
+<ol>
+<li>保持和Logger同样的使用方式</li>
+<li>增加是否缓存到本地的开关，用法为：
+<code>ZLogger.init(TAG).methodCount(1).hideThreadInfo().cache2Local(context,true);</code>
+</li>
+</ol>
+
+##Download
+<code>implementation 'com.affy:zlogger:1.0.1'<code>
+
 ##混淆规则
 <code>-keep class com.affy.zlogger.\*\*{\*;}</code><br/>
  <code>-dontwarn com.affy.zlogger.\*\*</code>
-
