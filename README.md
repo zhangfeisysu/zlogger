@@ -7,16 +7,19 @@
 </ol>
 
 ##使用说明
-<ol>
-<li>保持和Logger同样的使用方式</li>
-<li>增加是否缓存到本地的开关，用法为：
-<code>ZLogger.init(TAG).methodCount(1).hideThreadInfo().cache2Local(context,true);</code>
-</li>
-</ol>
+1.保持和Logger同样的使用方式<br/>
+2.增加是否缓存到本地的开关，用法为：
+```java
+ZLogger.init(TAG).methodCount(1).hideThreadInfo().cache2Local(context,true);
+```
 
 ##Download
-<code>implementation 'com.affy:zlogger:1.0.1'<code>
+```java
+implementation 'com.affy:zlogger:1.0.1'
+```
 
 ##混淆规则
-<code>-keep class com.affy.zlogger.\*\*{\*;}</code><br/>
- <code>-dontwarn com.affy.zlogger.\*\*</code>
+```java
+-keep class com.affy.zlogger.**{*;}
+-dontwarn com.affy.zlogger.**
+```
