@@ -2,17 +2,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion "28.0.3"
 
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 21
+        targetSdkVersion 26
         versionCode 2
         versionName "2.0.0"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
     buildTypes {
         release {
@@ -36,7 +33,7 @@ publish {
 }
 
 task makeJar(type: Copy) {
-    from('build/intermediates/bundles/debug/')
+    from('build/intermediates/bundles/release/')
     into('release')
     include('classes.jar')
     rename('classes.jar', 'zlogger.jar')
