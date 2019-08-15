@@ -16,16 +16,20 @@ public class MainActivity extends Activity {
         for (int i = 0; i < 200; i++) {
             sb.append("Hello ZLogger!");
         }
-        ZLogger.d("Hello ZLogger!");
-        mCount = 0;
-        while (mCount < 10) {
-            mCount++;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    ZLogger.d("thread : " + mCount + sb.toString());
-                }
-            }).start();
-        }
+        ZLogger.t("fei").d("Hello ZLogger!");
+        //mCount = 0;
+        //while (mCount < 10) {
+        //    mCount++;
+        //    new Thread(new Runnable() {
+        //        @Override
+        //        public void run() {
+        //            ZLogger.d(mCount + " thread : " + sb.toString());
+        //        }
+        //    }).start();}
+
+        ZLogger.getPrinter().getSettings().logLevel(LogLevel.NONE);
+        ZLogger.d("no log");
+        ZLogger.getPrinter().getSettings().logLevel(LogLevel.FULL).methodCount(1).hideThreadInfo();
+        ZLogger.d("has log");
     }
 }

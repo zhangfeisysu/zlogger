@@ -19,6 +19,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-//    implementation project(':zlogger')
-    implementation 'com.affy:zlogger:1.0.2'
+    implementation project(':zlogger')
+//    implementation 'com.affy:zlogger:1.0.2'
 }

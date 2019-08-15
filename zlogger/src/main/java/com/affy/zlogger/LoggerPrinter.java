@@ -1,9 +1,6 @@
 package com.affy.zlogger;
 
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,8 +23,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
-import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
 final class LoggerPrinter implements Printer {
 
@@ -86,7 +81,6 @@ final class LoggerPrinter implements Printer {
      * It is used to determine log settings such as method count, thread info visibility
      */
     private final Settings settings = new Settings();
-    private Handler mLogHandler;
 
     public LoggerPrinter() {
         init(DEFAULT_TAG);
@@ -105,9 +99,6 @@ final class LoggerPrinter implements Printer {
         if (tag.trim().length() == 0) {
             throw new IllegalStateException("tag may not be empty");
         }
-        HandlerThread handlerThread = new HandlerThread("zlogger", THREAD_PRIORITY_BACKGROUND);
-        handlerThread.start();
-        mLogHandler = new Handler(handlerThread.getLooper());
         this.tag = tag;
         return settings;
     }
@@ -228,53 +219,47 @@ final class LoggerPrinter implements Printer {
     }
 
     @Override
-    public void log(final int priority, final String tag, final String msg, final Throwable throwable) {
+    public synchronized void log(int priority, String tag, String message, Throwable throwable) {
         if (settings.getLogLevel() == LogLevel.NONE) {
             return;
         }
-        runOnLogThread(new Runnable() {
-            @Override
-            public void run() {
-                String message = msg;
-                if (throwable != null && message != null) {
-                    message += " : " + Helper.getStackTraceString(throwable);
-                }
-                if (throwable != null && message == null) {
-                    message = Helper.getStackTraceString(throwable);
-                }
-                if (message == null) {
-                    message = "No message/exception is set";
-                }
-                int methodCount = getMethodCount();
-                if (Helper.isEmpty(message)) {
-                    message = "Empty/NULL log message";
-                }
+        if (throwable != null && message != null) {
+            message += " : " + Helper.getStackTraceString(throwable);
+        }
+        if (throwable != null && message == null) {
+            message = Helper.getStackTraceString(throwable);
+        }
+        if (message == null) {
+            message = "No message/exception is set";
+        }
+        int methodCount = getMethodCount();
+        if (Helper.isEmpty(message)) {
+            message = "Empty/NULL log message";
+        }
 
-                logTopBorder(priority, tag);
-                logHeaderContent(priority, tag, methodCount);
+        logTopBorder(priority, tag);
+        logHeaderContent(priority, tag, methodCount);
 
-                //get bytes of message with system's default charset (which is UTF-8 for Android)
-                byte[] bytes = message.getBytes();
-                int length = bytes.length;
-                if (length <= CHUNK_SIZE) {
-                    if (methodCount > 0) {
-                        logDivider(priority, tag);
-                    }
-                    logContent(priority, tag, message);
-                    logBottomBorder(priority, tag);
-                    return;
-                }
-                if (methodCount > 0) {
-                    logDivider(priority, tag);
-                }
-                for (int i = 0; i < length; i += CHUNK_SIZE) {
-                    int count = Math.min(length - i, CHUNK_SIZE);
-                    //create a new String with system's default charset (which is UTF-8 for Android)
-                    logContent(priority, tag, new String(bytes, i, count));
-                }
-                logBottomBorder(priority, tag);
+        //get bytes of message with system's default charset (which is UTF-8 for Android)
+        byte[] bytes = message.getBytes();
+        int length = bytes.length;
+        if (length <= CHUNK_SIZE) {
+            if (methodCount > 0) {
+                logDivider(priority, tag);
             }
-        });
+            logContent(priority, tag, message);
+            logBottomBorder(priority, tag);
+            return;
+        }
+        if (methodCount > 0) {
+            logDivider(priority, tag);
+        }
+        for (int i = 0; i < length; i += CHUNK_SIZE) {
+            int count = Math.min(length - i, CHUNK_SIZE);
+            //create a new String with system's default charset (which is UTF-8 for Android)
+            logContent(priority, tag, new String(bytes, i, count));
+        }
+        logBottomBorder(priority, tag);
     }
 
     @Override
@@ -283,20 +268,15 @@ final class LoggerPrinter implements Printer {
     }
 
     /**
-     * This method is run on single thread in order to avoid messy of logs' order.
+     * This method is synchronized in order to avoid messy of logs' order.
      */
-    private void log(final int priority, final Throwable throwable, final String msg, final Object... args) {
+    private synchronized void log(int priority, Throwable throwable, String msg, Object... args) {
         if (settings.getLogLevel() == LogLevel.NONE) {
             return;
         }
-        runOnLogThread(new Runnable() {
-            @Override
-            public void run() {
-                String tag = getTag();
-                String message = createMessage(msg, args);
-                log(priority, tag, message, throwable);
-            }
-        });
+        String tag = getTag();
+        String message = createMessage(msg, args);
+        log(priority, tag, message, throwable);
     }
 
     private void logTopBorder(int logType, String tag) {
@@ -427,32 +407,27 @@ final class LoggerPrinter implements Printer {
         }
     }
 
-    private void saveLog2File(final int type, final String tag, final String content) {
-        runOnLogThread(new Runnable() {
+    private synchronized void saveLog2File(final int type, final String tag, final String content) {
+        if (content == null) return;
+        Date now = new Date();
+        String date = new SimpleDateFormat("yyyy-MM-dd MM-dd", Locale.getDefault()).format(now);
+        final String fullPath = settings.getCachePath() + "ZLogger-" + date + ".txt";
+        if (!FileUtils.createOrExistsFile(fullPath)) return;
+        String time = new SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(now);
+        int pid = android.os.Process.myPid();
+        final String dateLogContent = time + " : " + translateLogType(type) + "/" + tag + "( " + pid + "): " + content + '\n';
+        AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                if (content == null) return;
-                Date now = new Date();
-                String date = new SimpleDateFormat("yyyy-MM-dd MM-dd", Locale.getDefault()).format(now);
-                final String fullPath = settings.getCachePath() + "ZLogger-" + date + ".txt";
-                if (!FileUtils.createOrExistsFile(fullPath)) return;
-                String time = new SimpleDateFormat("MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(now);
-                int pid = android.os.Process.myPid();
-                final String dateLogContent = time + " : " + translateLogType(type) + "/" + tag + "( " + pid + "): " + content + '\n';
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        BufferedWriter bw = null;
-                        try {
-                            bw = new BufferedWriter(new FileWriter(fullPath, true));
-                            bw.write(dateLogContent);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } finally {
-                            FileUtils.closeIO(bw);
-                        }
-                    }
-                });
+                BufferedWriter bw = null;
+                try {
+                    bw = new BufferedWriter(new FileWriter(fullPath, true));
+                    bw.write(dateLogContent);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    FileUtils.closeIO(bw);
+                }
             }
         });
     }
@@ -534,11 +509,4 @@ final class LoggerPrinter implements Printer {
         return -1;
     }
 
-    private void runOnLogThread(Runnable r) {
-        if (Looper.myLooper() == mLogHandler.getLooper()) {
-            r.run();
-        } else {
-            mLogHandler.post(r);
-        }
-    }
 }
