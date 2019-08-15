@@ -18,7 +18,7 @@ ZLogger.init(TAG).methodCount(1).hideThreadInfo().cache2Local(context,true);
 Download
 --------
 ```groovy
-implementation 'com.affy:zlogger:1.0.1'
+implementation 'com.affy:zlogger:1.0.2'
 ```
 
 ProGuard
