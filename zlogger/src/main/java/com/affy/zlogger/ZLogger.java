@@ -65,34 +65,58 @@ public final class ZLogger {
     }
 
     public static void d(String message, Object... args) {
+        if (printer.getSettings().getLogLevel() == LogLevel.NONE) {
+            return;
+        }
         printer.d(message, args);
     }
 
     public static void d(Object object) {
+        if (printer.getSettings().getLogLevel() == LogLevel.NONE) {
+            return;
+        }
         printer.d(object);
     }
 
     public static void e(String message, Object... args) {
+        if (printer.getSettings().getLogLevel() == LogLevel.NONE) {
+            return;
+        }
         printer.e(null, message, args);
     }
 
     public static void e(Throwable throwable, String message, Object... args) {
+        if (printer.getSettings().getLogLevel() == LogLevel.NONE) {
+            return;
+        }
         printer.e(throwable, message, args);
     }
 
     public static void i(String message, Object... args) {
+        if (printer.getSettings().getLogLevel() == LogLevel.NONE) {
+            return;
+        }
         printer.i(message, args);
     }
 
     public static void v(String message, Object... args) {
+        if (printer.getSettings().getLogLevel() == LogLevel.NONE) {
+            return;
+        }
         printer.v(message, args);
     }
 
     public static void w(String message, Object... args) {
+        if (printer.getSettings().getLogLevel() == LogLevel.NONE) {
+            return;
+        }
         printer.w(message, args);
     }
 
     public static void wtf(String message, Object... args) {
+        if (printer.getSettings().getLogLevel() == LogLevel.NONE) {
+            return;
+        }
         printer.wtf(message, args);
     }
 
@@ -114,4 +138,7 @@ public final class ZLogger {
         printer.xml(xml);
     }
 
+    public static Printer getPrinter() {
+        return printer;
+    }
 }

@@ -11,5 +11,6 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         ZLogger.init("affy").methodCount(1).hideThreadInfo().cache2Local(this, true);
+        //ZLogger.init("affy").logLevel(LogLevel.NONE);
     }
 }
